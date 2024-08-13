@@ -340,49 +340,51 @@ else
 		git clone https://gitlab.winehq.org/wine/wine.git wine
 		BUILD_NAME="${WINE_VERSION}-$(git -C wine rev-parse --short HEAD)"
 	else
-		BUILD_NAME="${WINE_VERSION}"
 
-		wget -q --show-progress "https://dl.winehq.org/wine/source/${WINE_URL_VERSION}/wine-${WINE_VERSION}.tar.xz"
-		tar xf "wine-${WINE_VERSION}.tar.xz"
-		mv "wine-${WINE_VERSION}" wine
+        git clone -b wine-${WINE_VERSION} https://gitlab.winehq.org/wine/wine.git wine
+		BUILD_NAME="${WINE_VERSION}-$(git -C wine rev-parse --short HEAD)"
+
+		# wget -q --show-progress "https://dl.winehq.org/wine/source/${WINE_URL_VERSION}/wine-${WINE_VERSION}.tar.xz"
+		# tar xf "wine-${WINE_VERSION}.tar.xz"
+		# mv "wine-${WINE_VERSION}" wine
 	fi
 
-        if [ "$WINE_BRANCH" = "staging" ] || [ "$WINE_BRANCH" = "vanilla" ]; then
-	if [ "${WINE_VERSION}" = "git" ]; then
-    git clone https://github.com/wine-staging/wine-staging wine-staging-"${WINE_VERSION}"
-    upstream_commit="$(cat wine-staging-"${WINE_VERSION}"/staging/upstream-commit | head -c 7)"
-    git -C wine checkout "${upstream_commit}"
-    if [ "$WINE_BRANCH" = "vanilla" ]; then
-    BUILD_NAME="${WINE_VERSION}-${upstream_commit}"
-    else
-    BUILD_NAME="${WINE_VERSION}-${upstream_commit}-staging"
+    if [ "$WINE_BRANCH" = "staging" ] || [ "$WINE_BRANCH" = "vanilla" ]; then
+        if [ "${WINE_VERSION}" = "git" ]; then
+            git clone https://github.com/wine-staging/wine-staging wine-staging-"${WINE_VERSION}"
+            upstream_commit="$(cat wine-staging-"${WINE_VERSION}"/staging/upstream-commit | head -c 7)"
+            git -C wine checkout "${upstream_commit}"
+            if [ "$WINE_BRANCH" = "vanilla" ]; then
+            BUILD_NAME="${WINE_VERSION}-${upstream_commit}"
+            else
+            BUILD_NAME="${WINE_VERSION}-${upstream_commit}-staging"
+            fi
+        else
+            if [ -n "${STAGING_VERSION}" ]; then
+                WINE_VERSION="${STAGING_VERSION}"
+            fi
+
+            if [ "${WINE_BRANCH}" = "vanilla" ]; then
+                BUILD_NAME="${WINE_VERSION}"
+            else
+                BUILD_NAME="${WINE_VERSION}"-staging
+            fi
+
+            wget -q --show-progress "https://github.com/wine-staging/wine-staging/archive/v${WINE_VERSION}.tar.gz"
+            tar xf v"${WINE_VERSION}".tar.gz
+
+            if [ ! -f v"${WINE_VERSION}".tar.gz ]; then
+                git clone https://github.com/wine-staging/wine-staging wine-staging-"${WINE_VERSION}"
+            fi
+        fi
+
+        if [ -f wine-staging-"${WINE_VERSION}"/patches/patchinstall.sh ]; then
+            staging_patcher=("${BUILD_DIR}"/wine-staging-"${WINE_VERSION}"/patches/patchinstall.sh
+                            DESTDIR="${BUILD_DIR}"/wine)
+        else
+            staging_patcher=("${BUILD_DIR}"/wine-staging-"${WINE_VERSION}"/staging/patchinstall.py)
+        fi
     fi
-else
-    if [ -n "${STAGING_VERSION}" ]; then
-        WINE_VERSION="${STAGING_VERSION}"
-    fi
-
-    if [ "${WINE_BRANCH}" = "vanilla" ]; then
-    BUILD_NAME="${WINE_VERSION}"
-    else
-    BUILD_NAME="${WINE_VERSION}"-staging
-fi
-
-    wget -q --show-progress "https://github.com/wine-staging/wine-staging/archive/v${WINE_VERSION}.tar.gz"
-    tar xf v"${WINE_VERSION}".tar.gz
-
-    if [ ! -f v"${WINE_VERSION}".tar.gz ]; then
-        git clone https://github.com/wine-staging/wine-staging wine-staging-"${WINE_VERSION}"
-    fi
-fi
-
-if [ -f wine-staging-"${WINE_VERSION}"/patches/patchinstall.sh ]; then
-    staging_patcher=("${BUILD_DIR}"/wine-staging-"${WINE_VERSION}"/patches/patchinstall.sh
-                    DESTDIR="${BUILD_DIR}"/wine)
-else
-    staging_patcher=("${BUILD_DIR}"/wine-staging-"${WINE_VERSION}"/staging/patchinstall.py)
-fi
-fi
 
 # Wine-Staging patch arguments
 # Not recommended to change these if statements unless you know what you are doing.
