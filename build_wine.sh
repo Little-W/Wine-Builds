@@ -261,7 +261,7 @@ export CROSSLDFLAGS="${LDFLAGS}"
 ## Flags used to compile wine-osu..
 if [ "$WINE_OSU" = "true" ]; then
 	export CPPFLAGS="-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 -DNDEBUG -D_NDEBUG"
-	_common_cflags="-march=silvermont -mtune=generic -O3 -msse3 -mfpmath=sse -pipe -fno-strict-aliasing -fomit-frame-pointer -fwrapv -Wno-error=incompatible-pointer-types -Wno-error=implicit-function-declaration -Wno-error=int-conversion -w"
+	_common_cflags="-march=x86-64 -mtune=generic -O3 -msse3 -mfpmath=sse -pipe -fno-strict-aliasing -fomit-frame-pointer -fwrapv -Wno-error=incompatible-pointer-types -Wno-error=implicit-function-declaration -Wno-error=int-conversion -w"
 	_native_common_cflags="" # only for the non-mingw side
 
 	_GCC_FLAGS="${_common_cflags} ${_native_common_cflags} ${CPPFLAGS}"
