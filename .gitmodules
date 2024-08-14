@@ -1,0 +1,3 @@
+[submodule "upstream_patches"]
+	path = upstream_patches
+	url = git@github.com:whrvt/wine-osu-patches.git
