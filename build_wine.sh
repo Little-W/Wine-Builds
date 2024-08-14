@@ -101,7 +101,7 @@ export OSU_OLD_REVERT="false"
 
 # Adds Wayland support to Wine builds. Should work by default on latest builds, 
 # probably needs to be set on false on custom/older ones.
-export ENABLE_WAYLAND="true"
+export ENABLE_WAYLAND="false"
 
 # Available proton branches: proton_3.7, proton_3.16, proton_4.2, proton_4.11
 # proton_5.0, proton_5.13, experimental_5.13, proton_6.3, experimental_6.3
@@ -158,14 +158,31 @@ fi
 
 WINE_BUILD_OPTIONS=(
 	--prefix="${BUILD_DIR}"/"${BUILD_OUT_TMP_DIR}"
+    --disable-winemenubuilder
+    --disable-win16
 	--disable-tests
 	--with-x
 	--with-gstreamer
 	--with-xattr
+    --without-capi
+    --without-dbus
 	--without-oss
 	--without-coreaudio
 	--without-cups
 	--without-sane
+    --without-gphoto
+    --without-gssapi
+    --without-krb5
+    --without-osmesa
+    --without-pcap
+    --without-pcsclite
+    --without-udev
+    --without-unwind
+    --without-usb
+    --without-v4l2
+    --without-wayland
+    --without-xinerama
+    --without-xxf86vm
 )
 
 # Options appended only to the lib64 portion of the build
