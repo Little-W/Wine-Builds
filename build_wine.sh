@@ -88,7 +88,7 @@ export RELEASE_VERSION="2"
 
 # Name for patchset you want to apply (e.g. protonGE-9-4-osu-patchset from osu-misc/patches/)
 # Leave empty if you have loose patches in custompatches/
-PATCHSET="9.14-2-patchset"
+PATCHSET="9.14-2-patchset-new"
 # Custom path for Wine source
 export CUSTOM_WINE_SOURCE=""
 
