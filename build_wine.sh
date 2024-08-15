@@ -161,9 +161,7 @@ WINE_BUILD_OPTIONS=(
     --disable-winemenubuilder
     --disable-win16
 	--disable-tests
-	--with-x
-	--with-gstreamer
-	--with-xattr
+    --with-gstreamer
     --without-capi
     --without-dbus
 	--without-oss
@@ -584,6 +582,9 @@ git init &> /dev/null || true
 git add --all || true
 git commit -m "makepkg" || true
 
+###
+chmod +x dlls/winevulkan/make_vulkan
+dlls/winevulkan/make_vulkan
 chmod +x tools/make_makefiles
 tools/make_makefiles
 chmod +x tools/make_requests
