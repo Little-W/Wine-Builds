@@ -530,6 +530,13 @@ fi
 # Changing winepulse.drv and other audio components for osu! if enabled
 if [ "${OLD_WINE_OSU}" = "true" ] ; then
 
+git revert --no-commit 2bfe81e41f93ce75139e3a6a2d0b68eb2dcb8fa6 || {
+        echo "Error: Failed to revert one or two patches. Stopping."
+        exit 1
+    }
+    clear
+
+
 	osu_files=("audio-revert.tar")
 
 	for file in "${osu_files[@]}"
