@@ -1,8 +1,8 @@
-name: Proton CI
+name: Proton Proot WoW64 CI
 
 on:
   schedule:
-    - cron:  '0 0 1 * *'
+    - cron:  '0 0 1,17 * *'
   workflow_dispatch:
 
 jobs:
@@ -14,19 +14,20 @@ jobs:
       - name: Download artifact
         id: download-artifact
         uses: dawidd6/action-download-artifact@v2
+        continue-on-error: true
         with:
           workflow: bootstraps.yml
           workflow_conclusion: success
           path: /opt
-      - name: Build Proton
+      - name: Build Wine
         run: |
           sudo apt update
           sudo apt install debootstrap perl git wget xz-utils bubblewrap autoconf
           sudo tar -C /opt -xpf /opt/Bootstraps/bootstraps.tar.xz
           chmod +x build_wine.sh
-          WINE_BRANCH=proton ./build_wine.sh
+          PROTON_BRANCH=proton_9.0  ./build_wine.sh
           sha256sum *.tar.xz
       - uses: actions/upload-artifact@v3
         with:
-          name: Proton
+          name: Proton Proot WoW64
           path: ./*.tar.xz

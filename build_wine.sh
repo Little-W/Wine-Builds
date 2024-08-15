@@ -81,7 +81,7 @@ export WINE_VERSION="9c69ccf8ef2995548ef5fee9d0b68f68dec5dd62"
 export STAGING_VERSION="1143543d4a4c31879b7fb376b6ca0d3e63f97984"
 
 # Available branches: winello-git, winello, vanilla, staging, staging-tkg, proton, wayland, custom, local
-export WINE_BRANCH="winello-git"
+export WINE_BRANCH="proton"
 
 # Optional extra release identifier to be added to the package, otherwise will be 1
 export RELEASE_VERSION="2"
@@ -107,7 +107,7 @@ export ENABLE_WAYLAND="false"
 # proton_5.0, proton_5.13, experimental_5.13, proton_6.3, experimental_6.3
 # proton_7.0, experimental_7.0
 # Leave empty to use the default branch.
-export PROTON_BRANCH="proton_7.0"
+PROTON_BRANCH=${PROTON_BRANCH:-"bleeding-edge"}
 
 # Specify custom arguments for the Staging's patchinstall.sh script.
 # For example, if you want to disable ntdll-NtAlertThreadByThreadId
