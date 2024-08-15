@@ -63,7 +63,13 @@ prepare_chroot () {
 }
 
 create_build_scripts () {
-  	libxkbcommon_version="1.6.0"
+  	libxkbcommon_version="1.7.0"
+	sdl2_version="2.30.2"
+	faudio_version="24.05"
+	vulkan_headers_version="1.3.239"
+	vulkan_loader_version="1.3.239"
+	spirv_headers_version="sdk-1.3.239.0"
+ 	libpcap_version="1.10.4"
 
 	cat <<EOF > "${MAINDIR}"/prepare_chroot.sh
 #!/bin/bash
@@ -114,9 +120,16 @@ apt-get -y install wayland-protocols libwayland-egl-backend-dev libwayland-egl-b
 apt-get -y install python3-pip libxcb-xkb-dev libxcb-xkb-dev:i386
 pip3 install meson
 pip3 install ninja
-export PATH="/usr/local/bin:/bin:/sbin:/usr/bin:/usr/sbin"
+apt-get -y install cmake
+apt-get -y install libxpresent-dev libjxr-dev libusb-1.0-0-dev libgcrypt20-dev libpulse-dev libudev-dev libsane-dev libv4l-dev libkrb5-dev libgphoto2-dev liblcms2-dev libcapi20-dev
+apt-get -y install libjpeg62-dev samba-dev libfreetype-dev libunwind-dev ocl-icd-opencl-dev libgnutls28-dev libx11-dev libxcomposite-dev libxcursor-dev libxfixes-dev libxi-dev libxrandr-dev 
+apt-get -y install libxrender-dev libxext-dev libpcsclite-dev libcups2-dev libosmesa6-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
+apt-get -y install libxcb-xkb-dev libfontconfig-dev libgl-dev
+apt-get -y build-dep gstreamer1.0 gstreamer1.0-plugins-bad gstreamer1.0-alsa gstreamer1.0-gl
 
+export PATH="/usr/local/bin:/bin:/sbin:/usr/bin:/usr/sbin"
 sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 90 --slave /usr/bin/g++ g++ /usr/bin/g++-13 --slave /usr/bin/gcov gcov /usr/bin/gcov-13
+
 
 # Installing llvm-mingw...
 if ! [ -d /usr/local/llvm-mingw ]; then
@@ -125,6 +138,9 @@ if ! [ -d /usr/local/llvm-mingw ]; then
 	mv /usr/local/llvm-mingw-20240619-ucrt-ubuntu-20.04-x86_64 /usr/local/llvm-mingw
 	rm llvm-mingw.tar.xz
 fi
+
+wget -O mingw.tar.xz http://techer.pascal.free.fr/Red-Rose_MinGW-w64-Toolchain/Red-Rose-MinGW-w64-Posix-Urct-v12.0.0.r0.g819a6ec2e-Gcc-11.4.1.tar.xz	tar -xf llvm-mingw.tar.xz -C /usr/local
+tar xf mingw.tar.xz -C /
 
 # Compiling libxkbcommon from source (not in Ubuntu 20.04 repos)...
 if ! [ -d libxkbcommon-${libxkbcommon_version}/build_i386 ]; then
@@ -154,7 +170,7 @@ if ! [ -d libxkbcommon-${libxkbcommon_version}/build_i386 ]; then
 	cpu = 'i386'
 	endian = 'little'
 	" | tee /opt/build32-conf.txt
-
+	
 	export PKG_CONFIG_PATH="/usr/lib/i386-linux-gnu/pkgconfig"
 	export LD_LIBRARY_PATH="/usr/lib/i386-linux-gnu"
 	CFLAGS="-m32" LDFLAGS="-m32" meson setup build_i386 -Denable-docs=false --prefix=/usr/local/i386 --libdir=lib/i386-linux-gnu \
@@ -166,6 +182,48 @@ if ! [ -d libxkbcommon-${libxkbcommon_version}/build_i386 ]; then
 	rm libxkbcommon.tar.xz
 fi
 
+wget -O /usr/include/linux/userfaultfd.h https://raw.githubusercontent.com/zen-kernel/zen-kernel/f787614c40519eb2c8ebdc116b2cd09d46e5ec85/include/uapi/linux/userfaultfd.h
+
+mkdir /opt/build_libs
+cd /opt/build_libs
+wget -O sdl.tar.gz https://www.libsdl.org/release/SDL2-${sdl2_version}.tar.gz
+wget -O faudio.tar.gz https://github.com/FNA-XNA/FAudio/archive/${faudio_version}.tar.gz
+wget -O vulkan-loader.tar.gz https://github.com/KhronosGroup/Vulkan-Loader/archive/v${vulkan_loader_version}.tar.gz
+wget -O vulkan-headers.tar.gz https://github.com/KhronosGroup/Vulkan-Headers/archive/v${vulkan_headers_version}.tar.gz
+wget -O spirv-headers.tar.gz https://github.com/KhronosGroup/SPIRV-Headers/archive/refs/tags/vulkan-sdk-1.3.283.0.tar.gz
+wget -O libpcap.tar.gz https://www.tcpdump.org/release/libpcap-${libpcap_version}.tar.gz
+if [ -d /usr/lib/x86_64-linux-gnu ]; then wget -O wine.deb https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/main/binary-amd64/wine-stable_9.0.0.0~jammy-1_amd64.deb; fi
+git clone https://gitlab.freedesktop.org/gstreamer/gstreamer.git -b 1.24 --depth 1
+#
+tar xf sdl.tar.gz
+tar xf faudio.tar.gz
+tar xf vulkan-loader.tar.gz
+tar xf vulkan-headers.tar.gz
+tar xf spirv-headers.tar.gz
+tar xf libpcap.tar.gz
+export CFLAGS="-O2"
+export CXXFLAGS="-O2"
+mkdir build && cd build
+cmake ../SDL2-${sdl2_version} && make -j$(nproc) && make install
+cd ../ && rm -r build && mkdir build && cd build
+cmake ../FAudio-${faudio_version} && make -j$(nproc) && make install
+cd ../ && rm -r build && mkdir build && cd build
+cmake ../Vulkan-Headers-${vulkan_headers_version} && make -j$(nproc) && make install
+cd ../ && rm -r build && mkdir build && cd build
+cmake ../Vulkan-Loader-${vulkan_loader_version}
+make -j$(nproc)
+make install
+cd ../ && rm -r build && mkdir build && cd build
+cmake ../SPIRV-Headers-vulkan-sdk-1.3.283.0 && make -j$(nproc) && make install
+cd ../ && dpkg -x wine.deb .
+cp opt/wine-stable/bin/widl /usr/bin
+cd ../ && rm -r build && mkdir build && cd build
+../libpcap-${libpcap_version}/configure && make -j$(nproc) install
+cd /opt && rm -r /opt/build_libs
+cd ../gstreamer
+meson setup build
+ninja -C build
+ninja -C build install
 # Cleaning...
 apt-get -y clean
 apt-get -y autoclean
