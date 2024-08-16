@@ -212,7 +212,7 @@ fi
 ## ------------------------------------------------------------
 
 # Change these paths to where your Ubuntu bootstraps reside
-_distro=$(grep "${scriptdir}"/create_ubuntu_bootstraps.sh -e "CHROOT_DISTRO=" | cut -f2 -d'"')
+_distro=$(grep "${scriptdir}"/create_ubuntu_bootstraps_noble.sh -e "CHROOT_DISTRO=" | cut -f2 -d'"')
 export BOOTSTRAP_PATH=/opt/chroots/"${_distro}"_chroot
 
 # Alias for bwrap setup
