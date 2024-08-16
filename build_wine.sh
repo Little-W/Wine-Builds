@@ -161,7 +161,6 @@ WINE_BUILD_OPTIONS=(
     --disable-winemenubuilder
     --disable-win16
 	--disable-tests
-    --with-gstreamer
     --without-capi
     --without-dbus
 	--without-oss
