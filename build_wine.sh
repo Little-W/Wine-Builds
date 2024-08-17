@@ -51,7 +51,7 @@ export WINE_OSU="true"
 export OLD_WINE_OSU="false"
 
 # Use llvm-mingw to compile (default since 9.11)
-export USE_LLVM="true"
+export USE_LLVM="fasle"
 
 # Use clang instead of gcc (default since 9.11-2, requires USE_LLVM=true)
 export USE_CLANG="true"
