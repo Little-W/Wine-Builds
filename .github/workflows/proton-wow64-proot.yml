@@ -16,14 +16,14 @@ jobs:
         uses: dawidd6/action-download-artifact@v2
         continue-on-error: true
         with:
-          workflow: bootstraps_noble.yml
+          workflow: bootstraps.yml
           workflow_conclusion: success
           path: /opt
       - name: Build Wine
         run: |
           sudo apt update
           sudo apt install debootstrap perl git wget xz-utils bubblewrap autoconf
-          sudo tar -C /opt -xpf /opt/Bootstraps/bootstraps-noble.tar.xz
+          sudo tar -C /opt -xpf /opt/Bootstraps/bootstraps.tar.xz
           chmod +x build_wine.sh
           PROTON_BRANCH=proton_9.0  ./build_wine.sh
           sha256sum *.tar.xz
