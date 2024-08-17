@@ -567,6 +567,14 @@ if [ -n "${PATCHSET}" ]; then
 	patches_dir="${scriptdir}"/patchset-current
 fi
 
+if [ "${PROTON_BRANCH}" = "experimental_9.0" ] || [ "${PROTON_BRANCH}" = "bleeding-edge" ]; then
+	patch -d wine -Np1 < "${scriptdir}"/other_patches/proton-exp-9.0.patch
+fi
+
+if [ "${PROTON_BRANCH}" = "proton_9.0" ] ; then
+	patch -d wine -Np1 < "${scriptdir}"/other_patches/proton-9.0.patch
+fi
+
 cd "${BUILD_DIR}"/wine
 rm "${scriptdir}"/patches.log || true
 
