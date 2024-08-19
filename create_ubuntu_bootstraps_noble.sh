@@ -69,6 +69,7 @@ create_build_scripts () {
 	vulkan_loader_version="1.3.239"
 	spirv_headers_version="sdk-1.3.239.0"
  	libpcap_version="1.10.4"
+  	libxkbcommon_version="1.7.0"
 
 	cat <<EOF > "${MAINDIR}"/prepare_chroot.sh
 #!/bin/bash
@@ -114,10 +115,10 @@ apt-get -y install libxrender-dev libxext-dev libpcsclite-dev libcups2-dev libos
 apt-get -y install python3-pip libxcb-xkb-dev libfontconfig-dev libgl-dev
 apt-get -y install meson ninja-build libxml2 libxml2-dev libxkbcommon-dev libxkbcommon0 xkb-data
 apt-get -y build-dep gstreamer1.0 gstreamer1.0-plugins-bad gstreamer1.0-alsa gstreamer1.0-gl
-apt-get -y install libdrm-dev
+apt-get -y install libdrm-dev libwayland-* 
 apt-get install -y libclang-18-dev libclang-common-18-dev libclang-cpp18-dev \
   libclc-18 libclc-18-dev libllvmspirvlib-18-dev llvm-18 llvm-18-dev llvm-18-linker-tools \
-  llvm-18-runtime llvm-18-tools llvm-spirv-18 libpolly-18-dev llvm-18* clang
+  llvm-18-runtime llvm-18-tools llvm-spirv-18 libpolly-18-dev llvm-18* clang nasm
 
 export PATH="/usr/local/bin:/bin:/sbin:/usr/bin:/usr/sbin"
 sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 90 --slave /usr/bin/g++ g++ /usr/bin/g++-14 --slave /usr/bin/gcov gcov /usr/bin/gcov-14
@@ -131,6 +132,47 @@ if ! [ -d /usr/local/llvm-mingw ]; then
 fi
 
 wget -O /usr/include/linux/userfaultfd.h https://raw.githubusercontent.com/zen-kernel/zen-kernel/f787614c40519eb2c8ebdc116b2cd09d46e5ec85/include/uapi/linux/userfaultfd.h
+
+
+# Compiling libxkbcommon from source (not in Ubuntu 20.04 repos)...
+if ! [ -d libxkbcommon-${libxkbcommon_version}/build_i386 ]; then
+	wget -O libxkbcommon.tar.xz https://xkbcommon.org/download/libxkbcommon-${libxkbcommon_version}.tar.xz
+	tar -xf libxkbcommon.tar.xz
+	cd libxkbcommon-${libxkbcommon_version}
+	rm -rf build
+	rm -rf build_i386
+
+	# 64bit libxkbcommon...
+	meson setup build -Denable-docs=false
+	ninja -C build
+	ninja -C build install
+	rm -rf build
+
+	# 32bit libxkbcommon...
+	echo "[binaries]
+	c = '/usr/bin/gcc'
+	cpp = '/usr/bin/g++'
+	ar = 'ar'
+	strip = 'strip'
+	pkgconfig = 'pkg-config'
+
+	[host_machine]
+	system = 'linux'
+	cpu_family = 'x86'
+	cpu = 'i386'
+	endian = 'little'
+	" | tee /opt/build32-conf.txt
+
+	export PKG_CONFIG_PATH="/usr/lib/i386-linux-gnu/pkgconfig"
+	export LD_LIBRARY_PATH="/usr/lib/i386-linux-gnu"
+	CFLAGS="-m32" LDFLAGS="-m32" meson setup build_i386 -Denable-docs=false --prefix=/usr/local/i386 --libdir=lib/i386-linux-gnu \
+	--native-file /opt/build32-conf.txt 
+	ninja -C build_i386
+	ninja -C build_i386 install
+	rm /opt/build32-conf.txt 
+	cd ..
+	rm libxkbcommon.tar.xz
+fi
 
 mkdir /opt/build_libs
 cd /opt/build_libs
