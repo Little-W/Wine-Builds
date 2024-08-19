@@ -114,7 +114,7 @@ export PROTON_BRANCH="proton_7.0"
 # patchset, but apply all other patches, then set this variable to
 # "--all -W ntdll-NtAlertThreadByThreadId"
 # Leave empty to apply all Staging patches
-export STAGING_ARGS="--all -W odbc32-fixes"
+export STAGING_ARGS="--all"
 
 # Set this to a path to your Wine source code (for example, /home/username/wine-custom-src).
 # This is useful if you already have the Wine source code somewhere on your
@@ -287,7 +287,7 @@ if [ "$USE_LLVM" = "true" ] && [ "$WINE_OSU" = "true" ]; then
 	export CROSSCC="x86_64-w64-mingw32-clang"
 
 	# feel free to do this a better way :)
-	__llvm_ver="$(basename "$(find "${BOOTSTRAP_PATH}"/"${LLVM_MINGW_PATH}"/lib/clang/ -mindepth 1 -maxdepth 1)" )" || \
+	__llvm_ver="$(env ls -1 "${BOOTSTRAP_PATH}"/"${LLVM_MINGW_PATH}"/lib/clang/)" || \
 		Error "llvm-mingw didn't have a valid version in lib/clang/_version_"
 
 	_CROSS_FLAGS="${_CROSS_FLAGS} -L${LLVM_MINGW_PATH}/lib -I${LLVM_MINGW_PATH}/include -I${LLVM_MINGW_PATH}/lib/clang/$__llvm_ver/include -I${LLVM_MINGW_PATH}/generic-w64-mingw32/include -L${LLVM_MINGW_PATH}/x86_64-w64-mingw32/lib -L${LLVM_MINGW_PATH}/i686-w64-mingw32/lib -L${LLVM_MINGW_PATH}/lib/clang/$__llvm_ver/lib/windows"
@@ -462,6 +462,9 @@ elif [ "$WINE_BRANCH" = "winello-git" ]; then
 	if [ "$(git rev-parse HEAD)" = "09a6d0f2913b064e09ed0bdc27b7bbc17a5fb0fc" ]; then
 		Info "Adding staging hotfix to remove the 'odbc-remove-unixodbc' patchset"
 		STAGING_ARGS+=" -W odbc-remove-unixodbc"
+	elif [ "$(git rev-parse HEAD)" = "9c69ccf8ef2995548ef5fee9d0b68f68dec5dd62" ]; then
+		Info "Adding staging hotfix to remove the 'odbc32-fixes' patchset"
+		STAGING_ARGS+=" -W odbc32-fixes"
 	fi
 
 	WINE_VERSION=$(git describe --tags --abbrev=0 | cut -f2 -d'-')
