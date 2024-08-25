@@ -2,6 +2,7 @@ name: Wine WoW64 Manual CI
 
 on:
   workflow_dispatch:
+  push:
 
 jobs:
   build:
