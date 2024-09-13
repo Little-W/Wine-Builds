@@ -51,7 +51,7 @@ export WINE_OSU="true"
 export OLD_WINE_OSU="false"
 
 # Use llvm-mingw to compile (default since 9.11)
-export USE_LLVM="fasle"
+USE_LLVM=${USE_LLVM:-"false"}
 
 # Use clang instead of gcc (default since 9.11-2, requires USE_LLVM=true)
 export USE_CLANG="true"
@@ -145,6 +145,10 @@ export USE_CCACHE="true"
 ## ------------------------------------------------------------
 
 BUILD_OUT_TMP_DIR=wine-"${WINE_BRANCH}"-build
+
+if [ "${USE_LLVM}" = "true" ]; then
+	BUILD_OUT_TMP_DIR="${BUILD_OUT_TMP_DIR}-llvm"
+fi
 
 if [ "${SANITIZED_BUILD}" = "true" ]; then
 	Info "Using experimental sanitized build."

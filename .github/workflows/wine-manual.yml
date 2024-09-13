@@ -18,15 +18,26 @@ jobs:
           workflow: bootstraps_noble.yml
           workflow_conclusion: success
           path: /opt
-      - name: Build Wine
+      - name: Build Wine using GCC
         run: |
           sudo apt update
           sudo apt install debootstrap perl git wget xz-utils bubblewrap autoconf
           sudo tar -C /opt -xpf /opt/Bootstraps/bootstraps-noble.tar.xz
           chmod +x build_wine.sh
-          ./build_wine.sh
+          USE_LLVM=false ./build_wine.sh
           sha256sum *.tar.xz
       - uses: actions/upload-artifact@v3
         with:
-          name: Wine-WoW64-Manual
+          name: Wine-WoW64-Manual-GCC
+          path: ./*.tar.xz
+      
+      - name : Build Wine using Clang
+        run: |
+          rm -rf *.tar.xz
+          USE_LLVM=true ./build_wine.sh
+          sha256sum *.tar.xz
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Wine-WoW64-Manual-Clang
           path: ./*.tar.xz
