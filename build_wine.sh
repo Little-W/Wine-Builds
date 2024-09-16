@@ -76,9 +76,9 @@ SANITIZED_BUILD="true"
 # This variable affects only winello-git, vanilla, and staging branches. Other branches
 # use their own versions.
 # "winello-git" takes tag names or commit hashes (e.g. wine-9.11)
-export WINE_VERSION="6e15604c48acd63dd8095a4ce2fd011cb3be96db"
+export WINE_VERSION="0cdc3b092cbe13b8a029e12fda32b5f5ef04641e"
 # This only applies to winello-git branches. Takes tag names or commit hashes (e.g. v9.11)
-export STAGING_VERSION="5eeb4b76d6f460456238582d5e3fc200dcfae1f6"
+export STAGING_VERSION="b6944be8105b3307765793ced0e64a646eeae8d1"
 
 # Available branches: winello-git, winello, vanilla, staging, staging-tkg, proton, wayland, custom, local
 export WINE_BRANCH="winello-git"
