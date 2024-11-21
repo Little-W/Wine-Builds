@@ -76,9 +76,9 @@ SANITIZED_BUILD="true"
 # This variable affects only winello-git, vanilla, and staging branches. Other branches
 # use their own versions.
 # "winello-git" takes tag names or commit hashes (e.g. wine-9.11)
-export WINE_VERSION="2b32c2859166e5542012b517cdef4699d8bb322c"
+export WINE_VERSION="60ddc9613b0a48b20fd1180409bea849f02961ef"
 # This only applies to winello-git branches. Takes tag names or commit hashes (e.g. v9.11)
-export STAGING_VERSION="3dfacea342c956ca8e2b2b7d7da339636f56eed1"
+export STAGING_VERSION="32abf9fc9756ad912b39acb93bcf60f448942a20"
 
 # Available branches: winello-git, winello, vanilla, staging, staging-tkg, proton, wayland, custom, local
 export WINE_BRANCH="winello-git"
@@ -114,7 +114,7 @@ export PROTON_BRANCH="proton_7.0"
 # patchset, but apply all other patches, then set this variable to
 # "--all -W ntdll-NtAlertThreadByThreadId"
 # Leave empty to apply all Staging patches
-export STAGING_ARGS="--all"
+export STAGING_ARGS="--all -W eventfd_synchronization"
 
 # Set this to a path to your Wine source code (for example, /home/username/wine-custom-src).
 # This is useful if you already have the Wine source code somewhere on your
